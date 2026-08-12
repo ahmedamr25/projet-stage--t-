@@ -1,0 +1,74 @@
+[
+  {
+    "id": "28a079e2-630a-407b-aa82-ee51bbb5ec24",
+    "owner": "admin",
+    "title": "GitHub Enterprise",
+    "websiteUrl": "https://github.com",
+    "username": "admin_ad",
+    "encryptedPassword": "602d43f40aa3eb9d48d8d41a:e520566803a25eda9985e6a231747671:8811f7e99aa71629dbcc8c2fc331d6ddf8b9b004311c8f206d6872533819",
+    "category": "Professionnel",
+    "notes": "Clé SSH de déploiement configurée.",
+    "createdAt": "2026-07-06T09:39:34.143Z",
+    "updatedAt": "2026-07-06T09:39:34.143Z"
+  },
+  {
+    "id": "6363568f-1f97-4399-bead-bfc2021ef9e5",
+    "owner": "admin",
+    "title": "Serveur Proxmox",
+    "websiteUrl": "https://proxmox.entreprise.local:8006",
+    "username": "admin",
+    "encryptedPassword": "3b270b6a39551991f8c9df52:51bcde89aedf97b1e1bfd419df1d32ba:c4a6cc274a53fbb9dbe477341b3c434298c4ef311fde0ee29d",
+    "category": "Professionnel",
+    "notes": "Accès console SSH uniquement via VPN.",
+    "createdAt": "2026-07-06T09:39:34.144Z",
+    "updatedAt": "2026-07-07T11:21:40.066Z"
+  },
+  {
+    "id": "e2ef6a30-0926-40d6-a055-ca6cfd3baf99",
+    "owner": "admin",
+    "title": "Compte Bancaire Pro",
+    "websiteUrl": "https://banque.entreprise.local",
+    "username": "finance.admin",
+    "encryptedPassword": "d48ffea42e6bf326259fa339:225dacab7147c43bd5dff0803f90bbf3:322b6aab80ec1c70e5206ee13fc040f672e564d1d3b0f7dd6db8629aa4",
+    "category": "Finance",
+    "notes": "Double validation active sur le mobile.",
+    "createdAt": "2026-07-06T09:39:34.144Z",
+    "updatedAt": "2026-07-06T09:39:34.144Z"
+  },
+  {
+    "id": "4f9a4bad-d77f-4be9-b693-4c1f41ffe1a0",
+    "owner": "user",
+    "title": "Messagerie Outlook",
+    "websiteUrl": "https://outlook.office.com",
+    "username": "user@entreprise.local",
+    "encryptedPassword": "d3dfbd37784a35d1ea86bd20:e429601d3cacc7e6be43e7539ab6ab8a:d63c472206bafb1f026bc35ba5eb2ff0e19df7af9976",
+    "category": "Général",
+    "notes": "Boîte de messagerie professionnelle principale.",
+    "createdAt": "2026-07-06T09:39:34.144Z",
+    "updatedAt": "2026-07-06T09:39:34.144Z"
+  },
+  {
+    "id": "326ec559-49fb-4354-866a-e27f8c18d095",
+    "owner": "user",
+    "title": "LinkedIn Pro",
+    "websiteUrl": "https://linkedin.com",
+    "username": "collaborateur.com",
+    "encryptedPassword": "ca4f94d57b4ea22155193488:0c868058b44c3f5052d754594a127f22:90974fae7033e4ff93854cbbf765157af9feb6635b1d",
+    "category": "Réseaux Sociaux",
+    "notes": "Réseautage professionnel.",
+    "createdAt": "2026-07-06T09:39:34.145Z",
+    "updatedAt": "2026-07-06T09:39:34.145Z"
+  },
+  {
+    "id": "5fa69ab6-521f-44e4-8992-475442cfbba7",
+    "owner": "admin",
+    "title": "<script>alert(1)</script>",
+    "websiteUrl": "http://ddd",
+    "username": "<script>alert(1)</script>",
+    "encryptedPassword": "ebba9ac306a3d5247edbe711:d9eef9a9a63405adc2fa990db0eb3069:4d2cb8156b753ea3375e728527e7c2b93a2d5a7954e03b6747",
+    "category": "Général",
+    "notes": "<script>alert(1)</script>",
+    "createdAt": "2026-07-07T11:19:05.848Z",
+    "updatedAt": "2026-07-07T11:19:05.848Z"
+  }
+]

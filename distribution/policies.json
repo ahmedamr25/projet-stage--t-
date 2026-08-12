@@ -1,0 +1,10 @@
+{
+  "policies": {
+    "ExtensionSettings": {
+      "securpass@firefox": {
+        "installation_mode": "force_installed",
+        "install_url": "file:///C:/Users/Dell/Desktop/projet_stage/securpass-firefox.xpi"
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "manifest_version": 2,
+  "name": "SecurPass Autofill Direct",
+  "version": "1.1",
+  "description": "Extension de remplissage automatique direct et sécurisé pour le gestionnaire de mots de passe SecurPass.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost:5000/*",
+    "http://127.0.0.1:5000/*",
+    "https://localhost:5443/*",
+    "https://127.0.0.1:5443/*",
+    "<all_urls>"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "48": "icon.png",
+    "96": "icon.png"
+  }
+}

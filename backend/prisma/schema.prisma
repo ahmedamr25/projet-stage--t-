@@ -1,0 +1,92 @@
+// ============================================================
+// SCHÉMA PRISMA — SecurPass
+// ============================================================
+// Pour appliquer : npx prisma migrate dev --name init
+// Pour générer le client : npx prisma generate
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------
+// COFFRE-FORT : mots de passe chiffrés AES-256-GCM
+// ------------------------------------------------------------
+model Password {
+  id                String   @id @default(uuid())
+  owner             String   // identifiant LDAP du propriétaire
+  title             String
+  websiteUrl        String?
+  username          String?
+  encryptedPassword String   // format iv:tag:data (AES-256-GCM)
+  category          String   @default("Général")
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  shares            SharedPassword[]
+
+  @@index([owner])
+  @@map("passwords")
+}
+
+// ------------------------------------------------------------
+// PARTAGE : accès partagés entre utilisateurs
+// ------------------------------------------------------------
+model SharedPassword {
+  id           String    @id @default(uuid())
+  passwordId   String
+  password     Password  @relation(fields: [passwordId], references: [id], onDelete: Cascade)
+
+  sharedBy     String    // propriétaire qui partage
+  sharedWith   String    // destinataire du partage
+  permission   String    @default("read") // "read" | "write"
+
+  // Clé AES chiffrée avec la clé publique RSA du destinataire.
+  // Permet au destinataire de déchiffrer le mot de passe sans
+  // que le serveur ne connaisse la clé en clair.
+  encryptedKey String
+
+  expiresAt    DateTime? // null = pas d'expiration
+  createdAt    DateTime  @default(now())
+
+  @@unique([passwordId, sharedWith])
+  @@index([sharedWith])
+  @@index([sharedBy])
+  @@map("shared_passwords")
+}
+
+// ------------------------------------------------------------
+// CLÉS RSA : paires de clés par utilisateur (partage E2E)
+// ------------------------------------------------------------
+model UserKey {
+  username         String   @id
+  publicKey        String   // clé publique RSA-2048 (PEM) — stockée en clair
+  encryptedPrivKey String   // clé privée RSA chiffrée avec le mot de passe user
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("user_keys")
+}
+
+// ------------------------------------------------------------
+// HISTORIQUE DES MOTS DE PASSE (persistant en BDD)
+// ------------------------------------------------------------
+model PasswordHistory {
+  id                   String   @id @default(uuid())
+  owner                String
+  passwordId           String   // référence logique (pas FK pour garder l'historique après suppression)
+  title                String
+  encryptedOldPassword String   // ancien mot de passe chiffré AES-256-GCM
+  changedBy            String
+  changedAt            DateTime @default(now())
+
+  @@index([owner])
+  @@map("password_history")
+}

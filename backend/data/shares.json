@@ -1,0 +1,52 @@
+[
+  {
+    "id": "6da59b69-f821-4040-8f78-3ae9757ed1e8",
+    "passwordId": "e3b059e1-aa80-40f0-a128-32260e468e69",
+    "sharedBy": "ahmed",
+    "sharedWith": "administarteur",
+    "permission": "read",
+    "encryptedKey": "067586498a8ecee21add2380c78d306313b5dac57bc3ece02795ba2b16c44dc9",
+    "expiresAt": null,
+    "createdAt": "2026-07-29T09:53:28.235Z"
+  },
+  {
+    "id": "a8532e2f-64b1-4b75-a458-778e8bae5a87",
+    "passwordId": "20f4d242-240f-4824-b8f9-f623902ddd73",
+    "sharedBy": "Administrateur",
+    "sharedWith": "ahmed",
+    "permission": "read",
+    "encryptedKey": "2db3c9a1e88c368feefd2b96717c4ef15b73154ca2ec02460e4e39105d6322af",
+    "expiresAt": null,
+    "createdAt": "2026-07-29T10:09:29.346Z"
+  },
+  {
+    "id": "28dcf457-9ce1-4acf-a54a-d417d3b82552",
+    "passwordId": "e3b059e1-aa80-40f0-a128-32260e468e69",
+    "sharedBy": "ahmed",
+    "sharedWith": "administrateur",
+    "permission": "read",
+    "encryptedKey": "85d9b753d646f61a2084d469bb6ad77f63623a7ad198865c81707e7c168f82e6",
+    "expiresAt": null,
+    "createdAt": "2026-08-05T09:53:07.705Z"
+  },
+  {
+    "id": "3f59a86c-b049-47dd-a5e6-c0f325a85c6d",
+    "passwordId": "969f555f-2ff2-4d20-95b8-b4f6a97b8d34",
+    "sharedBy": "ahmed",
+    "sharedWith": "administrateur",
+    "permission": "read",
+    "encryptedKey": "b3c787ee20bbc8e36ce2be7c8ed1e6182797d835f27509328a2c62d8811a453d",
+    "expiresAt": null,
+    "createdAt": "2026-07-29T10:12:38.227Z"
+  },
+  {
+    "id": "9d0a1beb-7d4d-4482-97a3-0277ecdd8dda",
+    "passwordId": "969f555f-2ff2-4d20-95b8-b4f6a97b8d34",
+    "sharedBy": "ahmed",
+    "sharedWith": "amr",
+    "permission": "write",
+    "encryptedKey": "feb65c494358385705a4803bb97edc2c6aae6ca4249d2a197a48cdb50b5a97d1",
+    "expiresAt": null,
+    "createdAt": "2026-07-29T10:12:56.325Z"
+  }
+]

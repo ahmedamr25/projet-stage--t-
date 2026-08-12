@@ -1,0 +1,172 @@
+[
+  {
+    "id": "7671a239-d82f-4197-b361-c74bf4a06d22",
+    "timestamp": "2026-08-06T09:24:41.081Z",
+    "action": "vault.add",
+    "username": "ahmed",
+    "ip": "::ffff:127.0.0.1",
+    "target": "evefv",
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "96a5a951-05df-4446-8c4f-d39a0266cda3",
+    "timestamp": "2026-08-05T10:02:51.792Z",
+    "action": "security.hibp.check",
+    "username": "administrateur",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "a85af9dd-fc3a-42b2-b205-fcfaf6d1cc0e",
+    "timestamp": "2026-08-05T10:00:44.566Z",
+    "action": "auth.login.success",
+    "username": "administrateur",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "ec98387a-5b69-42dc-866e-5e7ddf1b6436",
+    "timestamp": "2026-08-05T10:00:14.582Z",
+    "action": "security.totp.setup",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "7ba4daa8-868d-4b7b-9e70-e8f085d5c441",
+    "timestamp": "2026-08-05T10:00:14.344Z",
+    "action": "security.totp.setup",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "dbad10fc-efc1-43ac-bc97-70b5c129770e",
+    "timestamp": "2026-08-05T10:00:13.624Z",
+    "action": "security.totp.setup",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "7f4fde5c-0159-4852-afc5-4726af506808",
+    "timestamp": "2026-08-05T10:00:10.030Z",
+    "action": "security.totp.setup",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "35042857-b148-4dcd-abc3-5e4e4e419c5d",
+    "timestamp": "2026-08-05T10:00:02.318Z",
+    "action": "security.totp.setup",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "f1ceb26b-03b9-42a5-a2eb-7556d6759911",
+    "timestamp": "2026-08-05T09:59:23.108Z",
+    "action": "security.hibp.check",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "47384254-8b23-4b05-90f5-37cd412ea701",
+    "timestamp": "2026-08-05T09:59:17.957Z",
+    "action": "security.hibp.check",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "bf45b010-abe7-4485-9413-a258752f8e96",
+    "timestamp": "2026-08-05T09:58:14.458Z",
+    "action": "vault.export.encrypted",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": "1 mots de passe",
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "58816f5b-d988-4d90-b7a5-f3717fce195f",
+    "timestamp": "2026-08-05T09:57:24.939Z",
+    "action": "vault.update",
+    "username": "ahmed",
+    "ip": "::ffff:127.0.0.1",
+    "target": "rre",
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "15482337-e82a-4233-bd33-e8f40890baba",
+    "timestamp": "2026-08-05T09:55:42.981Z",
+    "action": "security.totp.verify",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": false
+  },
+  {
+    "id": "b2ba4e89-cffa-43ce-9c6c-82dd106f6f03",
+    "timestamp": "2026-08-05T09:55:27.431Z",
+    "action": "security.totp.setup",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "85f5e944-be57-4409-af39-322d49ea6a5d",
+    "timestamp": "2026-08-05T09:55:06.963Z",
+    "action": "security.totp.setup",
+    "username": "ahmed",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "055485de-ba00-435d-a35b-7e023336a0c3",
+    "timestamp": "2026-08-05T09:53:58.876Z",
+    "action": "vault.update",
+    "username": "ahmed",
+    "ip": "::ffff:127.0.0.1",
+    "target": "rre",
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "1a5a40bc-bd27-4df4-b599-7d01ceb73208",
+    "timestamp": "2026-08-05T09:53:07.716Z",
+    "action": "share.create",
+    "username": "ahmed",
+    "ip": "::ffff:127.0.0.1",
+    "target": "rre",
+    "details": "shared_with:administrateur",
+    "success": true
+  }
+]

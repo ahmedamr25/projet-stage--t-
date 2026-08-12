@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Stockage et génération de mots de passe sécurisés avec authentification Active Directory LDAP et sécurité JWT.">
+  <title>SecurPass | Coffre-fort & Générateur de Mots de Passe</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons (Web-safe CDN for clean icons) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- ==========================================
+       ÉCRAN DE CONNEXION (LOGIN)
+       ========================================== -->
+  <div id="login-container" class="page-container active">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-icon">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <h1>SecurPass</h1>
+        <p class="subtitle">Gestionnaire de Mots de Passe Entreprise</p>
+        <span id="auth-mode-badge" class="badge badge-mock">Mode Connexion : Simulé</span>
+      </div>
+
+      <div id="login-error" class="alert alert-danger hidden">
+        <i data-lucide="alert-triangle"></i>
+        <span class="alert-message">Identifiant ou mot de passe incorrect.</span>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-username">Identifiant LDAP / Active Directory</label>
+          <div class="input-wrapper">
+            <i data-lucide="user" class="input-icon"></i>
+            <input type="text" id="login-username" name="username" placeholder="ex: jean.dupont" required
+              maxlength="64" pattern="[a-zA-Z0-9._-]{2,64}" autocomplete="username"
+              title="Lettres, chiffres, points, tirets et underscores uniquement (2-64 caractères)">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Mot de passe de session AD</label>
+          <div class="input-wrapper">
+            <i data-lucide="lock" class="input-icon"></i>
+            <input type="password" id="login-password" name="password" placeholder="••••••••••••" required maxlength="128">
+          </div>
+        </div>
+
+        <button type="submit" id="btn-login" class="btn btn-primary btn-block">
+          <span>Se connecter</span>
+          <i data-lucide="log-in"></i>
+        </button>
+
+        <div class="auth-divider" style="text-align: center; margin: 15px 0; color: rgba(255,255,255,0.4); font-size: 0.9rem; position: relative;">
+          <span style="background: rgba(30, 30, 40, 0.95); padding: 0 10px; position: relative; z-index: 2;">OU</span>
+          <div style="position: absolute; top: 50%; left: 0; right: 0; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1;"></div>
+        </div>
+
+        <button type="button" id="btn-sso" class="btn btn-outline btn-block" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;">
+          <i data-lucide="fingerprint"></i>
+          <span>Connexion Unique AD (SSO)</span>
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <p><i data-lucide="info" class="inline-icon"></i> Identifiez-vous avec vos identifiants réseau habituels.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       TABLEAU DE BORD (DASHBOARD)
+       ========================================== -->
+  <div id="dashboard-container" class="page-container hidden">
+    <!-- En-tête Global -->
+    <header class="main-header">
+      <div class="header-left">
+        <button id="btn-mobile-menu" class="btn btn-ghost btn-icon-only mobile-menu-btn" title="Menu">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="header-logo">
+          <i data-lucide="shield-check"></i>
+          <span>SecurPass</span>
+        </div>
+      </div>
+      <div class="header-user">
+        <div class="user-info">
+          <span id="user-display-name">Utilisateur</span>
+          <span id="user-username" class="user-subtext">@domaine</span>
+        </div>
+        <button id="btn-logout" class="btn btn-outline btn-icon-only" title="Se déconnecter">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Zone principale -->
+    <div class="dashboard-layout">
+      <!-- Sidebar / Navigation -->
+      <aside class="sidebar">
+        <nav class="sidebar-nav">
+          <button id="nav-vault" class="nav-item active">
+            <i data-lucide="folder-lock"></i>
+            <span>Coffre-fort</span>
+          </button>
+          <button id="nav-security" class="nav-item">
+            <i data-lucide="shield-check"></i>
+            <span>Sécurité</span>
+          </button>
+          <button id="nav-shared-with-me" class="nav-item">
+            <i data-lucide="users"></i>
+            <span>Partagés avec moi</span>
+          </button>
+          <button id="nav-generator" class="nav-item">
+            <i data-lucide="key-round"></i>
+            <span>Générateur</span>
+          </button>
+          <button id="nav-extension" class="nav-item">
+            <i data-lucide="chrome"></i>
+            <span>Extension Chrome</span>
+          </button>
+          <button id="nav-logs" class="nav-item">
+            <i data-lucide="scroll-text"></i>
+            <span>Logs d'inscription</span>
+          </button>
+          <button id="nav-admin" class="nav-item hidden">
+            <i data-lucide="sliders"></i>
+            <span>Administration</span>
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="crypto-status">
+            <i data-lucide="lock" class="text-success"></i>
+            <span>Chiffrement AES-256-GCM actif</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Contenu Principal -->
+      <main class="main-content">
+        <!-- SECTION 1 : LE COFFRE-FORT -->
+        <section id="section-vault" class="content-section active">
+          <div class="section-header">
+            <div>
+              <h2>Mon Coffre-fort</h2>
+              <p class="section-desc">Conservez, gérez et utilisez vos mots de passe chiffrés.</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button id="btn-add-password" class="btn btn-primary">
+                <i data-lucide="plus"></i>
+                <span>Ajouter un mot de passe</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Import/Export Actions Bar -->
+          <div class="card" style="padding: 15px 20px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+              <div>
+                <h4 style="margin: 0 0 5px 0; font-size: 0.95rem; color: #fff;">Import / Export</h4>
+                <p style="margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.6);">Importez vos mots de passe depuis un autre gestionnaire ou exportez votre coffre-fort</p>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="btn-import" class="btn btn-outline btn-sm">
+                  <i data-lucide="upload"></i>
+                  <span>Importer</span>
+                </button>
+                <button id="btn-export-csv" class="btn btn-outline btn-sm">
+                  <i data-lucide="file-text"></i>
+                  <span>Exporter CSV</span>
+                </button>
+                <button id="btn-export-json" class="btn btn-outline btn-sm">
+                  <i data-lucide="package"></i>
+                  <span>Exporter JSON</span>
+                </button>
+                <button id="btn-export-encrypted" class="btn btn-outline btn-sm">
+                  <i data-lucide="lock"></i>
+                  <span>Export Chiffré AES</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtres & Recherche -->
+          <div class="filters-bar">
+            <div class="search-wrapper">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="vault-search" placeholder="Rechercher par titre, identifiant, URL...">
+            </div>
+            <div class="category-filters">
+              <label for="filter-category" class="sr-only">Filtrer par catégorie</label>
+              <select id="filter-category" class="filter-select">
+                <option value="all">Toutes les catégories</option>
+                <option value="Général">Général</option>
+                <option value="Professionnel">Professionnel</option>
+                <option value="Personnel">Personnel</option>
+                <option value="Finance">Finance</option>
+                <option value="Réseaux Sociaux">Réseaux Sociaux</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Loader pendant le chargement -->
+          <div id="vault-loader" class="vault-loader hidden">
+            <div class="loader-spinner"></div>
+            <p>Chargement de votre coffre-fort...</p>
+          </div>
+
+          <!-- Grille des Mots de Passe -->
+          <div id="vault-grid" class="vault-grid">
+            <!-- Rempli dynamiquement en JS -->
+          </div>
+
+          <!-- État Vide -->
+          <div id="vault-empty-state" class="empty-state hidden">
+            <div class="empty-icon">
+              <i data-lucide="search-code"></i>
+            </div>
+            <h3>Aucun mot de passe trouvé</h3>
+            <p>Commencez par ajouter un mot de passe ou modifiez vos critères de recherche.</p>
+            <button id="btn-empty-add" class="btn btn-outline">
+              <i data-lucide="plus"></i>
+              <span>Ajouter un premier élément</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- SECTION SÉCURITÉ : DASHBOARD DE SÉCURITÉ PERSONNEL -->
+        <section id="section-security" class="content-section hidden">
+          <div class="section-header">
+            <div>
+              <h2>Dashboard de Sécurité Personnel</h2>
+              <p class="section-desc">Évaluation globale de la robustesse de vos mots de passe et recommandations.</p>
+            </div>
+            <button id="btn-refresh-security" class="btn btn-outline">
+              <i data-lucide="refresh-cw"></i>
+              <span>Actualiser</span>
+            </button>
+          </div>
+
+          <div class="security-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px;">
+            <!-- Carte Score Circle -->
+            <div class="card score-card" style="padding: 25px; display: flex; align-items: center; gap: 25px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;">
+              <div class="score-gauge-wrapper" style="position: relative; width: 100px; height: 100px;">
+                <svg class="score-gauge" viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="3" />
+                  <path id="score-circle-bar" class="circle-bar" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" style="transition: stroke-dasharray 1s ease, stroke 0.5s ease;" />
+                </svg>
+                <div class="score-value-box" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                  <span id="security-score-number" class="score-number" style="font-size: 1.6rem; font-weight: 800; color: #fff;">--</span>
+                  <span class="score-unit" style="font-size: 0.7rem; color: rgba(255,255,255,0.5);">/ 100</span>
+                </div>
+              </div>
+              <div class="score-summary-text">
+                <h3 id="security-score-status" style="margin: 0 0 5px 0; color: #fff; font-size: 1.1rem;">Évaluation en cours...</h3>
+                <p id="security-score-desc" style="margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.4;">Score basé sur la force, l'ancienneté et la réutilisation de vos clés.</p>
+              </div>
+            </div>
+
+            <!-- Cartes Métriques -->
+            <div class="security-metrics-row" style="display: flex; flex-direction: column; gap: 12px; justify-content: center;">
+              <div class="metric-card metric-weak" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px;">
+                <div style="display:flex; align-items:center; gap: 10px; color: #f87171;">
+                  <i data-lucide="alert-circle"></i>
+                  <span style="font-size: 0.9rem; font-weight: 500;">Faibles / Vulnérables</span>
+                </div>
+                <span id="metric-weak-count" style="font-size: 1.2rem; font-weight: 700; color: #f87171;">0</span>
+              </div>
+
+              <div class="metric-card metric-reused" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 10px;">
+                <div style="display:flex; align-items:center; gap: 10px; color: #fbbf24;">
+                  <i data-lucide="copy"></i>
+                  <span style="font-size: 0.9rem; font-weight: 500;">Réutilisés</span>
+                </div>
+                <span id="metric-reused-count" style="font-size: 1.2rem; font-weight: 700; color: #fbbf24;">0</span>
+              </div>
+
+              <div class="metric-card metric-expired" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 10px;">
+                <div style="display:flex; align-items:center; gap: 10px; color: #60a5fa;">
+                  <i data-lucide="clock"></i>
+                  <span style="font-size: 0.9rem; font-weight: 500;">Anciens / Expirés</span>
+                </div>
+                <span id="metric-expired-count" style="font-size: 1.2rem; font-weight: 700; color: #60a5fa;">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section TOTP 2FA dans Sécurité -->
+          <div class="card" style="padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+              <div>
+                <h3 style="margin: 0 0 5px 0; color: #fff; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                  <i data-lucide="smartphone" style="color: #60a5fa;"></i> Authentification à Deux Facteurs (TOTP 2FA)
+                </h3>
+                <p style="margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.6);">Sécurisez l'accès à votre compte Web avec une application d'authentification (Google Authenticator, Authy, Microsoft Authenticator).</p>
+              </div>
+              <button id="btn-setup-totp-web" class="btn btn-primary btn-sm">
+                <i data-lucide="qr-code"></i>
+                <span>Configurer la 2FA</span>
+              </button>
+            </div>
+            <div id="totp-setup-display" class="hidden" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);">
+              <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                <div style="background: #fff; padding: 10px; border-radius: 8px; font-family: monospace; word-break: break-all; max-width: 250px;">
+                  <span style="color: #000; font-weight: bold; font-size: 0.9rem;" id="totp-secret-code">--</span>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                  <p style="margin: 0 0 10px 0; font-size: 0.85rem; color: rgba(255,255,255,0.8);">Entrez le secret ci-dessus dans votre application TOTP ou copiez le lien OTPAuth.</p>
+                  <div style="display: flex; gap: 10px;">
+                    <input type="text" id="totp-verify-input" placeholder="Entrez le code à 6 chiffres" maxlength="6" style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; width: 160px;">
+                    <button id="btn-verify-totp-web" class="btn btn-outline btn-sm">Vérifier</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tableau des Vulnérabilités -->
+          <div class="table-card">
+            <div class="table-card-header">
+              <h3 style="margin: 0 0 5px 0; color: #fff;">Alertes & Recommandations</h3>
+              <p class="section-desc">Mots de passe nécessitant une attention ou une modification rapide.</p>
+            </div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Titre du compte</th>
+                  <th>Identifiant</th>
+                  <th>Problèmes détectés</th>
+                  <th style="text-align:right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="security-vulnerabilities-list">
+                <tr><td colspan="4" style="text-align:center; padding: 20px; color: rgba(255,255,255,0.5);">Aucune vulnérabilité détectée.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SECTION 1b : PARTAGÉS AVEC MOI -->
+        <section id="section-shared-with-me" class="content-section hidden">
+          <div class="section-header">
+            <div>
+              <h2>Partagés avec moi</h2>
+              <p class="section-desc">Mots de passe que vos collègues ont partagés avec vous.</p>
+            </div>
+            <button id="btn-refresh-shared" class="btn btn-outline">
+              <i data-lucide="refresh-cw"></i>
+              <span>Actualiser</span>
+            </button>
+          </div>
+
+          <!-- Loader pendant le chargement -->
+          <div id="shared-loader" class="vault-loader hidden">
+            <div class="loader-spinner"></div>
+            <p>Chargement des mots de passe partagés...</p>
+          </div>
+
+          <!-- Grille des Mots de Passe Partagés -->
+          <div id="shared-with-me-grid" class="vault-grid">
+            <!-- Rempli dynamiquement en JS -->
+          </div>
+
+          <!-- État Vide -->
+          <div id="shared-with-me-empty" class="empty-state hidden">
+            <div class="empty-icon">
+              <i data-lucide="users"></i>
+            </div>
+            <h3>Aucun mot de passe partagé</h3>
+            <p>Vos collègues n'ont encore rien partagé avec vous. Les mots de passe partagés apparaîtront ici.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 2 : LE GÉNÉRATEUR -->
+        <section id="section-generator" class="content-section hidden">
+          <div class="section-header">
+            <div>
+              <h2>Générateur de Mots de Passe</h2>
+              <p class="section-desc">Générez des mots de passe hautement sécurisés et robustes selon vos besoins.</p>
+            </div>
+          </div>
+
+          <div class="generator-container">
+            <!-- Carte Résultat -->
+            <div class="generator-output-card">
+              <div class="output-wrapper">
+                <input type="text" id="gen-output" readonly placeholder="Appuyez sur Générer pour créer un mot de passe">
+                <div class="output-actions">
+                  <button id="btn-copy-gen" class="btn btn-icon-only btn-ghost" title="Copier le mot de passe">
+                    <i data-lucide="copy"></i>
+                  </button>
+                  <button id="btn-refresh-gen" class="btn btn-icon-only btn-ghost" title="Générer un autre">
+                    <i data-lucide="refresh-cw"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="strength-bar-container">
+                <div id="gen-strength-bar" class="strength-bar"></div>
+              </div>
+              <div class="strength-label">
+                <span>Force du mot de passe :</span>
+                <strong id="gen-strength-text" class="text-muted">—</strong>
+              </div>
+              <div class="generator-actions">
+                <button id="btn-gen-save-vault" class="btn btn-outline" title="Sauvegarder dans le coffre-fort" style="margin-right: auto;">
+                  <i data-lucide="archive"></i>
+                  <span>Sauvegarder dans le coffre</span>
+                </button>
+                <button id="btn-gen-generate" class="btn btn-primary">
+                  <i data-lucide="zap"></i>
+                  <span>Générer</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Paramètres du Générateur -->
+            <div class="generator-settings-card">
+              <h3>Paramètres de Sécurité</h3>
+              
+              <div class="settings-group">
+                <div class="setting-row">
+                  <label for="gen-length">Longueur : <span id="length-val">16</span> caractères</label>
+                  <input type="range" id="gen-length" min="8" max="64" value="16" class="range-slider">
+                </div>
+
+                <div class="checkbox-grid">
+                  <label class="checkbox-card">
+                    <input type="checkbox" id="gen-opt-upper" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="checkbox-label">
+                      <strong>Majuscules</strong>
+                      <span class="desc">A-Z</span>
+                    </span>
+                  </label>
+
+                  <label class="checkbox-card">
+                    <input type="checkbox" id="gen-opt-lower" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="checkbox-label">
+                      <strong>Minuscules</strong>
+                      <span class="desc">a-z</span>
+                    </span>
+                  </label>
+
+                  <label class="checkbox-card">
+                    <input type="checkbox" id="gen-opt-numbers" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="checkbox-label">
+                      <strong>Chiffres</strong>
+                      <span class="desc">0-9</span>
+                    </span>
+                  </label>
+
+                  <label class="checkbox-card">
+                    <input type="checkbox" id="gen-opt-symbols" checked>
+                    <span class="checkbox-custom"></span>
+                    <span class="checkbox-label">
+                      <strong>Symboles</strong>
+                      <span class="desc">!@#$%^&*</span>
+                    </span>
+                  </label>
+                </div>
+
+                <div class="setting-row">
+                  <label class="checkbox-card full-width">
+                    <input type="checkbox" id="gen-opt-similar">
+                    <span class="checkbox-custom"></span>
+                    <span class="checkbox-label">
+                      <strong>Exclure les caractères similaires</strong>
+                      <span class="desc">Évite la confusion (ex: 0 et O, 1 et l, I)</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Historique de session -->
+            <div class="generator-history-card">
+              <h3>Historique de la session</h3>
+              <ul id="gen-history-list" class="history-list">
+                <li class="history-empty">Aucun mot de passe généré dans cette session.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3 : CONSOLE D'ADMINISTRATION -->
+        <section id="section-admin" class="content-section hidden">
+          <div class="section-header">
+            <div>
+              <h2>Console d'Administration</h2>
+              <p class="section-desc">Supervision de l'annuaire Active Directory et audit de sécurité du coffre-fort.</p>
+            </div>
+          </div>
+
+          <!-- Onglets d'Administration -->
+          <div class="admin-tabs">
+            <button id="admin-tab-stats" class="admin-tab-btn active">
+              <i data-lucide="bar-chart-3"></i>
+              <span>Statistiques de Sécurité</span>
+            </button>
+            <button id="admin-tab-users" class="admin-tab-btn">
+              <i data-lucide="users"></i>
+              <span>Utilisateurs AD / LDAP</span>
+            </button>
+          </div>
+
+          <!-- VUE 1 : STATISTIQUES ET AUDIT -->
+          <div id="admin-view-stats" class="admin-view active">
+            <!-- Grille de KPIs -->
+            <div class="stats-kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-header">
+                  <span class="kpi-title">Total Mots de Passe</span>
+                  <i data-lucide="lock" class="kpi-icon text-info"></i>
+                </div>
+                <div id="stat-total-passwords" class="kpi-value">—</div>
+                <div class="kpi-desc">Enregistrés en base de données</div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-header">
+                  <span class="kpi-title">Longueur Moyenne</span>
+                  <i data-lucide="binary" class="kpi-icon text-success"></i>
+                </div>
+                <div id="stat-avg-length" class="kpi-value">—</div>
+                <div class="kpi-desc">Caractères par mot de passe</div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-header">
+                  <span class="kpi-title">Dernière Modification</span>
+                  <i data-lucide="clock-3" class="kpi-icon text-info"></i>
+                </div>
+                <div id="stat-last-modified" class="kpi-value">—</div>
+                <div class="kpi-desc">Dernier changement enregistré dans le coffre</div>
+              </div>
+
+              <div class="kpi-card kpi-warning">
+                <div class="kpi-header">
+                  <span class="kpi-title">Mots de passe Réutilisés</span>
+                  <i data-lucide="copy" class="kpi-icon text-warning"></i>
+                </div>
+                <div id="stat-reused-passwords" class="kpi-value">—</div>
+                <div class="kpi-desc">Doublons en clair (risque majeur)</div>
+              </div>
+
+              <div class="kpi-card kpi-danger">
+                <div class="kpi-header">
+                  <span class="kpi-title">Extrêmement Faibles</span>
+                  <i data-lucide="shield-alert" class="kpi-icon text-danger"></i>
+                </div>
+                <div id="stat-extremely-weak" class="kpi-value">—</div>
+                <div class="kpi-desc">Mots de passe de moins de 8 caractères</div>
+              </div>
+            </div>
+
+            <!-- Graphiques & Listes de répartition -->
+            <div class="stats-charts-grid">
+              <!-- Force globale des mots de passe -->
+              <div class="chart-card">
+                <h3>Répartition par Force de Robustesse</h3>
+                <div class="bars-chart-container">
+                  <!-- Très Sécurisé -->
+                  <div class="chart-row">
+                    <div class="chart-row-label">
+                      <span>Très Sécurisé</span>
+                      <strong id="label-strength-strong">0</strong>
+                    </div>
+                    <div class="chart-row-bar-wrapper">
+                      <div id="bar-strength-strong" class="chart-row-bar bg-success" style="width: 0%"></div>
+                    </div>
+                  </div>
+                  <!-- Fort -->
+                  <div class="chart-row">
+                    <div class="chart-row-label">
+                      <span>Fort</span>
+                      <strong id="label-strength-good">0</strong>
+                    </div>
+                    <div class="chart-row-bar-wrapper">
+                      <div id="bar-strength-good" class="chart-row-bar bg-info" style="width: 0%"></div>
+                    </div>
+                  </div>
+                  <!-- Moyen -->
+                  <div class="chart-row">
+                    <div class="chart-row-label">
+                      <span>Moyen</span>
+                      <strong id="label-strength-fair">0</strong>
+                    </div>
+                    <div class="chart-row-bar-wrapper">
+                      <div id="bar-strength-fair" class="chart-row-bar bg-warning" style="width: 0%"></div>
+                    </div>
+                  </div>
+                  <!-- Faible -->
+                  <div class="chart-row">
+                    <div class="chart-row-label">
+                      <span>Faible / Vulnérable</span>
+                      <strong id="label-strength-weak">0</strong>
+                    </div>
+                    <div class="chart-row-bar-wrapper">
+                      <div id="bar-strength-weak" class="chart-row-bar bg-danger" style="width: 0%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Top utilisateurs -->
+              <div class="chart-card">
+                <h3>Mots de Passe stockés par Collaborateur</h3>
+                <div class="users-list-container">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Identifiant</th>
+                        <th>Nombre de secrets</th>
+                        <th>Niveau de risque</th>
+                      </tr>
+                    </thead>
+                    <tbody id="stats-users-list">
+                      <!-- Rempli dynamiquement -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VUE 2 : UTILISATEURS AD / LDAP -->
+          <div id="admin-view-users" class="admin-view hidden">
+            <!-- Formulaire d'ajout utilisateur AD (admin uniquement) -->
+            <div class="add-user-card">
+              <h3><i data-lucide="user-plus"></i> Ajouter un utilisateur Active Directory</h3>
+              <p class="section-desc">Réservé aux administrateurs. Les entrées sont filtrées pour prévenir les injections LDAP.</p>
+              <form id="add-user-form" class="add-user-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="add-user-username">Identifiant LDAP <span class="required">*</span></label>
+                    <input type="text" id="add-user-username" placeholder="ex: ahmed" required
+                      maxlength="64" pattern="[a-zA-Z0-9._-]{2,64}"
+                      title="Lettres, chiffres, points, tirets et underscores uniquement">
+                  </div>
+                  <div class="form-group">
+                    <label for="add-user-displayname">Nom d'affichage <span class="required">*</span></label>
+                    <input type="text" id="add-user-displayname" placeholder="ex: Ahmed Utilisateur" required maxlength="128">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="add-user-email">Adresse e-mail</label>
+                    <input type="email" id="add-user-email" placeholder="ex: ahmed@tiznit.local" maxlength="254">
+                  </div>
+                  <div class="form-group">
+                    <label for="add-user-password">Mot de passe initial <span class="required">*</span></label>
+                    <input type="password" id="add-user-password" placeholder="Min. 8 caractères" required minlength="8" maxlength="128">
+                  </div>
+                </div>
+                <div id="add-user-error" class="alert alert-danger hidden">
+                  <span class="alert-message"></span>
+                </div>
+                <button type="submit" id="btn-add-user" class="btn btn-primary">
+                  <i data-lucide="user-plus"></i>
+                  <span>Créer l'utilisateur AD</span>
+                </button>
+              </form>
+            </div>
+
+            <div class="table-card">
+              <div class="table-card-header" style="display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
+                <div>
+                  <h3>Utilisateurs de l'annuaire</h3>
+                  <p class="section-desc">Rechercher et gérer les comptes Active Directory.</p>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                  <div class="search-wrapper" style="margin:0;">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="search" id="admin-user-search" placeholder="Rechercher un utilisateur ou groupe...">
+                  </div>
+                  <span id="admin-users-count" class="badge-count">0 utilisateur(s)</span>
+                </div>
+              </div>
+              <table class="admin-table users-table">
+                <thead>
+                  <tr>
+                    <th>Utilisateur</th>
+                    <th>Identifiant LDAP</th>
+                    <th>Adresse e-mail</th>
+                    <th>Groupes AD</th>
+                    <th>Date d'importation / création</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-list">
+                  <!-- Rempli dynamiquement en JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 4 : EXTENSION CHROME -->
+        <section id="section-extension" class="content-section hidden">
+          <div class="section-header">
+            <div>
+              <h2>Extension Google Chrome</h2>
+              <p class="section-desc">Installez l'extension SecurPass pour un remplissage automatique en un clic sur tous vos sites web.</p>
+            </div>
+          </div>
+
+          <div class="extension-guide-container" style="display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 800px; margin: 0 auto;">
+            <div class="card" style="padding: 25px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; backdrop-filter: blur(10px);">
+              <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px; color: #fff;">
+                <i data-lucide="download" class="text-info" style="color: #60a5fa;"></i>
+                Comment installer l'extension ?
+              </h3>
+              <ol style="margin-left: 20px; line-height: 1.6; color: rgba(255,255,255,0.8); padding-left: 15px;">
+                <li style="margin-bottom: 10px;">Ouvrez Google Chrome et accédez à l'adresse <code>chrome://extensions</code>.</li>
+                <li style="margin-bottom: 10px;">Activez le <strong>"Mode développeur"</strong> en haut à droite de la page.</li>
+                <li style="margin-bottom: 10px;">Cliquez sur le bouton <strong>"Charger l'extension non empaquetée"</strong> en haut à gauche.</li>
+                <li style="margin-bottom: 10px;">Sélectionnez le dossier <strong><code>chrome-extension</code></strong> situé à la racine de votre projet <code>projet_stage</code>.</li>
+              </ol>
+            </div>
+
+            <div class="card" style="padding: 25px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; backdrop-filter: blur(10px);">
+              <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px; color: #fff;">
+                <i data-lucide="zap" class="text-success" style="color: #4ade80;"></i>
+                Démonstration instantanée
+              </h3>
+              <p style="color: rgba(255,255,255,0.8); line-height: 1.6;">
+                Une fois l'extension installée, ouvrez notre portail intranet de démonstration pour tester le remplissage et la connexion automatique :
+              </p>
+              <div style="display: flex; gap: 15px; margin-top: 15px;">
+                <a href="/mock-target.html" target="_blank" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+                  <i data-lucide="external-link"></i> Ouvrir le portail intranet de démo
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 5 : LOGS D'INSCRIPTION -->
+        <section id="section-logs" class="content-section hidden">
+          <div class="section-header">
+            <div>
+              <h2>Logs d'inscription</h2>
+              <p class="section-desc">Historique temporaire des inscriptions detectees par l'extension (24h).</p>
+            </div>
+            <button id="btn-refresh-logs" class="btn btn-outline">
+              <i data-lucide="refresh-cw"></i>
+              <span>Actualiser</span>
+            </button>
+          </div>
+
+          <div class="card" style="padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;">
+            <div id="logs-loader" class="vault-loader hidden">
+              <div class="loader-spinner"></div>
+              <p>Chargement des logs...</p>
+            </div>
+            <div id="logs-list" class="list-container" style="max-height: 500px; overflow-y: auto;">
+              <!-- Rempli dynamiquement -->
+            </div>
+            <div id="logs-empty" class="empty-state hidden">
+              <div class="empty-icon">
+                <i data-lucide="scroll-text"></i>
+              </div>
+              <h3>Aucun log disponible</h3>
+              <p>Les logs d'inscription apparaîtront ici lorsque l'extension detectera des formulaires.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL : AJOUTER / MODIFIER MOT DE PASSE
+       ========================================== -->
+  <div id="password-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modal-title">Ajouter un mot de passe</h2>
+        <button id="btn-close-modal" class="btn btn-ghost btn-icon-only">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div id="modal-error" class="alert alert-danger hidden">
+        <i data-lucide="alert-triangle"></i>
+        <span class="alert-message">Erreur lors de la sauvegarde.</span>
+      </div>
+
+      <form id="password-form">
+        <input type="hidden" id="entry-id">
+        
+        <div class="form-grid">
+          <div class="form-group col-6">
+            <label for="entry-title">Titre / Service <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <input type="text" id="entry-title" placeholder="ex: Google, GitHub, Banque" required>
+            </div>
+          </div>
+
+          <div class="form-group col-6">
+            <label for="entry-category">Catégorie</label>
+            <select id="entry-category" class="filter-select">
+              <option value="Général">Général</option>
+              <option value="Professionnel">Professionnel</option>
+              <option value="Personnel">Personnel</option>
+              <option value="Finance">Finance</option>
+              <option value="Réseaux Sociaux">Réseaux Sociaux</option>
+            </select>
+          </div>
+
+          <div class="form-group col-12">
+            <label for="entry-website">Adresse URL du Site Web</label>
+            <div class="input-wrapper">
+              <input type="url" id="entry-website" placeholder="https://example.com">
+            </div>
+          </div>
+
+          <div class="form-group col-6">
+            <label for="entry-username">Identifiant / Nom d'utilisateur</label>
+            <div class="input-wrapper">
+              <input type="text" id="entry-username" placeholder="ex: jean.dupont@email.com">
+            </div>
+          </div>
+
+          <div class="form-group col-6">
+            <label for="entry-password">Mot de passe <span class="required">*</span></label>
+            <div class="password-input-group">
+              <div class="input-wrapper password-field-wrapper">
+                <input type="password" id="entry-password" placeholder="Mot de passe" required>
+                <button type="button" id="btn-toggle-modal-pwd" class="btn-toggle-visibility" title="Afficher/masquer">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
+              <button type="button" id="btn-modal-generate" class="btn btn-outline" title="Générer un mot de passe fort">
+                <i data-lucide="sparkles"></i>
+                <span>Générer</span>
+              </button>
+            </div>
+            <!-- Indicateur de force dynamique -->
+            <div id="modal-strength-container" style="margin-top: 8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-size:0.75rem;">
+                <span style="color: rgba(255,255,255,0.7);">Force :</span>
+                <strong id="modal-strength-text" style="color: #f87171;">Faible</strong>
+              </div>
+              <div style="height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div id="modal-strength-bar" style="height: 100%; width: 25%; background: #f87171; transition: all 0.3s ease;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group col-12">
+            <label for="entry-notes">Notes / Observations</label>
+            <textarea id="entry-notes" rows="3" placeholder="Informations complémentaires, codes de secours, etc."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel-modal" class="btn btn-outline">Annuler</button>
+          <button type="submit" id="btn-save-password" class="btn btn-primary">
+            <i data-lucide="save"></i>
+            <span>Enregistrer</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL : ÉDITION UTILISATEUR AD (remplace prompt natif) -->
+  <div id="edit-user-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Modifier l'utilisateur Active Directory</h2>
+        <button id="btn-close-edit-user-modal" class="btn btn-ghost btn-icon-only">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="edit-user-form">
+        <input type="hidden" id="edit-user-target-username">
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label for="edit-user-displayname">Nom d'affichage <span class="required">*</span></label>
+          <input type="text" id="edit-user-displayname" required maxlength="128" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff;">
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label for="edit-user-email">Adresse e-mail</label>
+          <input type="email" id="edit-user-email" maxlength="254" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff;">
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label for="edit-user-new-password">Nouveau mot de passe (laisser vide pour ne pas modifier)</label>
+          <input type="password" id="edit-user-new-password" placeholder="••••••••••••" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff;">
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel-edit-user" class="btn btn-outline">Annuler</button>
+          <button type="submit" id="btn-submit-edit-user" class="btn btn-primary">
+            <i data-lucide="save"></i>
+            <span>Enregistrer les modifications</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+   <!-- MODAL : EXPORT CHIFFRÉ AES-256-GCM -->
+   <div id="export-encrypted-modal" class="modal-overlay hidden">
+     <div class="modal-card" style="max-width: 480px;">
+       <div class="modal-header">
+         <h2>Export Chiffré AES-256-GCM</h2>
+         <button id="btn-close-export-modal" class="btn btn-ghost btn-icon-only">
+           <i data-lucide="x"></i>
+         </button>
+       </div>
+
+       <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+         <div style="display: flex; align-items: start; gap: 10px;">
+           <i data-lucide="lock" style="width: 20px; height: 20px; color: #22c55e; flex-shrink: 0; margin-top: 2px;"></i>
+           <p style="margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.9); line-height: 1.5;">
+             <strong>Votre coffre-fort sera exporté chiffré avec AES-256-GCM.</strong>
+             Utilisez un mot de passe fort — il sera requis pour déchiffrer le fichier ultérieurement.
+           </p>
+         </div>
+       </div>
+
+       <form id="export-encrypted-form">
+         <div class="form-group">
+           <label for="export-password">Mot de passe de chiffrement <span class="required">*</span></label>
+           <div class="password-input-group">
+             <div class="input-wrapper password-field-wrapper">
+               <input type="password" id="export-password" placeholder="Mot de passe d'export (min. 4 caractères)" required>
+               <button type="button" id="btn-toggle-export-pwd" class="btn-toggle-visibility" title="Afficher/masquer">
+                 <i data-lucide="eye"></i>
+               </button>
+             </div>
+           </div>
+           <div id="export-strength-container" style="margin-top: 8px;">
+             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-size:0.75rem;">
+               <span style="color: rgba(255,255,255,0.7);">Force :</span>
+               <strong id="export-strength-text" style="color: #f87171;">Faible</strong>
+             </div>
+             <div style="height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+               <div id="export-strength-bar" style="height: 100%; width: 0%; background: #f87171; transition: all 0.3s ease;"></div>
+             </div>
+           </div>
+         </div>
+
+         <div class="form-group">
+           <label for="export-password-confirm">Confirmer le mot de passe</label>
+           <input type="password" id="export-password-confirm" placeholder="Confirmer le mot de passe">
+         </div>
+
+         <div id="export-error" class="alert alert-danger hidden">
+           <i data-lucide="alert-triangle"></i>
+           <span class="alert-message"></span>
+         </div>
+
+         <div class="modal-footer">
+           <button type="button" id="btn-cancel-export-modal" class="btn btn-outline">Annuler</button>
+           <button type="submit" id="btn-submit-export-modal" class="btn btn-primary">
+             <i data-lucide="download"></i>
+             <span>Générer l'export chiffré</span>
+           </button>
+         </div>
+       </form>
+     </div>
+   </div>
+
+   <!-- Modal de Confirmation de Suppression -->
+  <div id="confirm-modal" class="modal-overlay hidden">
+    <div class="modal-card confirm-card">
+      <div class="confirm-icon">
+        <i data-lucide="alert-triangle"></i>
+      </div>
+      <h3 id="confirm-title">Confirmer la suppression</h3>
+      <p id="confirm-message">Êtes-vous sûr de vouloir supprimer ce mot de passe ? Cette action est irréversible.</p>
+      <div class="confirm-actions">
+        <button id="btn-confirm-cancel" class="btn btn-outline">Annuler</button>
+        <button id="btn-confirm-ok" class="btn btn-danger">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL : IMPORT DE MOTS DE PASSE
+       ========================================== -->
+  <div id="import-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Importer des mots de passe</h2>
+        <button id="btn-close-import-modal" class="btn btn-ghost btn-icon-only">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div id="import-error" class="alert alert-danger hidden">
+        <i data-lucide="alert-triangle"></i>
+        <span class="alert-message">Erreur lors de l'import.</span>
+      </div>
+
+      <div id="import-success" class="alert alert-success hidden" style="background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.3);">
+        <i data-lucide="check-circle"></i>
+        <span class="alert-message">Import réussi !</span>
+      </div>
+
+      <form id="import-form">
+        <div class="form-group">
+          <label for="import-format-select">Format du fichier</label>
+          <select id="import-format-select" class="filter-select">
+            <option value="csv">CSV (Chrome, Firefox, Edge, SecurPass)</option>
+            <option value="bitwarden">JSON Bitwarden</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="import-file-input">Choisir le fichier à importer</label>
+          <input type="file" id="import-file-input" accept=".csv,.json,.txt" required 
+                 style="display: block; width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; cursor: pointer;">
+        </div>
+
+        <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 12px; margin-top: 15px;">
+          <div style="display: flex; align-items: start; gap: 10px;">
+            <i data-lucide="alert-triangle" style="width: 20px; height: 20px; color: #fbbf24; flex-shrink: 0; margin-top: 2px;"></i>
+            <p style="margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.9); line-height: 1.5;">
+              <strong>Attention :</strong> Les mots de passe importés seront chiffrés et stockés dans votre coffre-fort. 
+              Assurez-vous que le fichier provient d'une source fiable. Supprimez le fichier d'import après usage.
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel-import-modal" class="btn btn-outline">Annuler</button>
+          <button type="submit" id="btn-submit-import" class="btn btn-primary">
+            <i data-lucide="upload"></i>
+            <span>Importer maintenant</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL : PARTAGE DE MOT DE PASSE
+       ========================================== -->
+  <div id="share-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Partager un mot de passe</h2>
+        <button id="btn-close-share-modal" class="btn btn-ghost btn-icon-only">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div style="background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: start; gap: 10px;">
+          <i data-lucide="info" style="width: 20px; height: 20px; color: #60a5fa; flex-shrink: 0; margin-top: 2px;"></i>
+          <div style="margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.9); line-height: 1.5;">
+            <p style="margin: 0 0 5px 0;"><strong>Mot de passe :</strong> <span id="share-password-title-display" style="color: #60a5fa;">—</span></p>
+            <p style="margin: 0;">Partagez ce mot de passe avec un collègue de votre Active Directory.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="share-error" class="alert alert-danger hidden">
+        <i data-lucide="alert-triangle"></i>
+        <span class="alert-message">Erreur lors du partage.</span>
+      </div>
+
+      <form id="share-form">
+        <input type="hidden" id="share-password-id">
+        
+        <div class="form-group">
+          <label for="share-username">Partager avec l'utilisateur <span class="required">*</span></label>
+          <input type="text" id="share-username" placeholder="ex: ahmed" required
+                 pattern="[a-zA-Z0-9._-]{2,64}"
+                 title="Identifiant AD/LDAP (lettres, chiffres, points, tirets)">
+          <small style="color: rgba(255,255,255,0.6); font-size: 0.8rem; display: block; margin-top: 5px;">
+            Entrez l'identifiant LDAP exact du destinataire (ex: ahmed, marie.dupont)
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Permission accordée <span class="required">*</span></label>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
+            <label class="checkbox-card" style="cursor: pointer; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.03);">
+              <input type="radio" name="share-permission" value="read" checked style="margin-right: 10px;">
+              <span class="checkbox-label">
+                <strong>👁️ Lecture seule</strong>
+                <span class="desc" style="display: block; color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 4px;">Le destinataire peut uniquement consulter le mot de passe</span>
+              </span>
+            </label>
+            <label class="checkbox-card" style="cursor: pointer; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.03);">
+              <input type="radio" name="share-permission" value="write" style="margin-right: 10px;">
+              <span class="checkbox-label">
+                <strong>✏️ Lecture + Modification</strong>
+                <span class="desc" style="display: block; color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 4px;">Le destinataire peut modifier le mot de passe (vous restez propriétaire)</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="share-expiration">Expiration du partage</label>
+          <select id="share-expiration" class="filter-select">
+            <option value="never">Jamais (permanent)</option>
+            <option value="24h">24 heures</option>
+            <option value="7d" selected>7 jours</option>
+            <option value="30d">30 jours</option>
+            <option value="90d">90 jours</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel-share-modal" class="btn btn-outline">Annuler</button>
+          <button type="submit" id="btn-submit-share" class="btn btn-primary">
+            <i data-lucide="share-2"></i>
+            <span>Partager</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL : GESTION DES PARTAGES
+       ========================================== -->
+  <div id="manage-shares-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>Gérer les accès partagés</h2>
+        <button id="btn-close-manage-shares-modal" class="btn btn-ghost btn-icon-only">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div style="background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+        <p style="margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.9);">
+          <strong>Mot de passe :</strong> <span id="manage-shares-password-title" style="color: #60a5fa;">—</span>
+        </p>
+      </div>
+
+      <div id="manage-shares-loader" class="vault-loader hidden">
+        <div class="loader-spinner"></div>
+        <p>Chargement des partages...</p>
+      </div>
+
+      <div id="manage-shares-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+        <!-- Rempli dynamiquement -->
+      </div>
+
+      <div id="manage-shares-empty" class="empty-state hidden" style="padding: 40px 20px;">
+        <div class="empty-icon">
+          <i data-lucide="users"></i>
+        </div>
+        <h4 style="margin: 10px 0 5px 0;">Aucun partage actif</h4>
+        <p style="margin: 0; color: rgba(255,255,255,0.6); font-size: 0.9rem;">Ce mot de passe n'est partagé avec personne pour le moment.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-close-manage-shares-only" class="btn btn-outline">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast-notification" class="toast hidden">
+    <i data-lucide="check-circle" class="toast-icon"></i>
+    <span id="toast-message">Copié dans le presse-papiers !</span>
+  </div>
+
+  <!-- Initialisation des icônes Lucide -->
+  <script>
+    // Lucide s'initialise après le chargement du DOM, géré également dans app.js
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+    });
+  </script>
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+</body>
+</html>

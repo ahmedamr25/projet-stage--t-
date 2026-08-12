@@ -1,0 +1,62 @@
+[
+  {
+    "id": "4e9d5696-98eb-4e60-93cb-3cd35d6423c1",
+    "owner": "admin",
+    "title": "GitHub Enterprise",
+    "websiteUrl": "https://github.com",
+    "username": "admin_ad",
+    "encryptedPassword": "b32ee6cc0358b21c264be43e:07f6b1b105fdb3970abf78352c4825a9:c0a44a69e65792ff61f3a4187119cbecc614a92e98188642313671878f2e",
+    "category": "Professionnel",
+    "notes": "Clé SSH de déploiement configurée.",
+    "createdAt": "2026-07-22T08:49:35.296Z",
+    "updatedAt": "2026-07-22T08:49:35.297Z"
+  },
+  {
+    "id": "8a8d5696-98eb-4e60-93cb-3cd35d6423c2",
+    "owner": "admin",
+    "title": "Intranet Tiznit (Démo DirectFill)",
+    "websiteUrl": "http://localhost:5000/mock-target.html",
+    "username": "ahmed.admin@tiznit.local",
+    "encryptedPassword": "f4d8d8333ab1ea294ecaab00:69a6d5f8332b48d25e2b4abbf3c6a98d:6a7c8c4e0cd1055ebc1b",
+    "category": "Professionnel",
+    "notes": "Compte de démonstration pour le remplissage automatique direct.",
+    "createdAt": "2026-07-22T08:49:35.297Z",
+    "updatedAt": "2026-07-22T08:49:35.297Z"
+  },
+  {
+    "id": "9f8d5696-98eb-4e60-93cb-3cd35d6423c3",
+    "owner": "admin",
+    "title": "Compte Bancaire Pro",
+    "websiteUrl": "https://banque.entreprise.local",
+    "username": "finance.admin",
+    "encryptedPassword": "8eccdcf0e5509f847379d8a2:018ddb1a3c66c6936ba9a5055b86d5d3:8da4139a31c16662953c2411704ed4796db3da38a0d22bef4cde311991",
+    "category": "Finance",
+    "notes": "Double validation active sur le mobile.",
+    "createdAt": "2026-07-22T08:49:35.297Z",
+    "updatedAt": "2026-07-22T08:49:35.297Z"
+  },
+  {
+    "id": "0a8d5696-98eb-4e60-93cb-3cd35d6423c4",
+    "owner": "user",
+    "title": "Messagerie Outlook",
+    "websiteUrl": "https://outlook.office.com",
+    "username": "user@entreprise.local",
+    "encryptedPassword": "5881b7c24cb1ceecb92ec530:e21e3118b4d25dbcbd178f76e74efeca:1b6db210540f4e6bb3c95d31f182823a0e423b3caf77",
+    "category": "Général",
+    "notes": "Boîte de messagerie professionnelle principale.",
+    "createdAt": "2026-07-22T08:49:35.297Z",
+    "updatedAt": "2026-07-22T08:49:35.297Z"
+  },
+  {
+    "id": "1a8d5696-98eb-4e60-93cb-3cd35d6423c5",
+    "owner": "user",
+    "title": "Intranet Tiznit (Démo DirectFill)",
+    "websiteUrl": "http://localhost:5000/mock-target.html",
+    "username": "user@tiznit.local",
+    "encryptedPassword": "2298a25c44aaac0c5737c69d:23978e4320d52a85b0857eb2efbc258f:b9f593b3b11edd2f693d",
+    "category": "Général",
+    "notes": "Accès portail intranet.",
+    "createdAt": "2026-07-22T08:49:35.297Z",
+    "updatedAt": "2026-07-22T08:49:35.297Z"
+  }
+]
