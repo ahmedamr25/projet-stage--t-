@@ -99,6 +99,12 @@ projet_stage/
 - **Administrateur** : `administrateur` / `Admin@2026!`
 - **Utilisateur Standard** : `user` / `User@2026!`
 
-### Connexion SSO Automatique
 
-Lorsque `LDAP_MOCK=true`, la connexion SSO détecte automatiquement le nom d'utilisateur Windows du PC et le recherche dans l'annuaire AD. Aucune configuration `SSO_USERNAME_MAP` n'est nécessaire.
+---
+
+## 🛡️ Guide Complet & Durcissement de la Sécurité
+
+Pour consulter les instructions détaillées de démarrage et la liste complète des recommandations de sécurité pour le passage en production (migration de **LDAP** à **LDAPS**, HTTPS, gestion des clés de chiffrement, durcissement PostgreSQL, etc.), consultez le guide dédié :
+
+👉 **[GUIDE_DEMARRAGE_ET_RECOMMANDATIONS_SECURITE.md](file:///c:/Users/Dell/Desktop/projet_stage/GUIDE_DEMARRAGE_ET_RECOMMANDATIONS_SECURITE.md)**
+

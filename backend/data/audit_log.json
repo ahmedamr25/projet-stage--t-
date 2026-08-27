@@ -1,5 +1,45 @@
 [
   {
+    "id": "a4808efc-7561-4d34-95bb-ff75e1689055",
+    "timestamp": "2026-08-18T09:45:44.039Z",
+    "action": "security.totp.setup",
+    "username": "dell",
+    "ip": "::ffff:127.0.0.1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "3160c26c-d437-4adb-84bf-f1951f4e7c5e",
+    "timestamp": "2026-08-18T09:40:17.214Z",
+    "action": "security.totp.setup",
+    "username": "dell",
+    "ip": "::ffff:127.0.0.1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "9a79fe7f-4e93-45e0-b6c1-d67be534e83d",
+    "timestamp": "2026-08-18T09:25:04.478Z",
+    "action": "security.totp.setup",
+    "username": "dell",
+    "ip": "::ffff:127.0.0.1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "d5a449ec-931c-4019-bc86-38a70d49034a",
+    "timestamp": "2026-08-18T09:24:37.712Z",
+    "action": "security.totp.setup",
+    "username": "dell",
+    "ip": "::ffff:127.0.0.1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
     "id": "7671a239-d82f-4197-b361-c74bf4a06d22",
     "timestamp": "2026-08-06T09:24:41.081Z",
     "action": "vault.add",

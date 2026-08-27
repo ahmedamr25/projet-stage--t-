@@ -1,0 +1,52 @@
+[
+  {
+    "id": "15741988-a5dc-41d0-a5ef-16f8cb408a46",
+    "timestamp": "2026-08-18T09:07:10.215Z",
+    "action": "share.create",
+    "username": "admin",
+    "ip": "::1",
+    "target": "Test GitHub",
+    "details": "shared_with:user123",
+    "success": true
+  },
+  {
+    "id": "95555393-64dd-4698-9b9a-5f09e6c8a3b1",
+    "timestamp": "2026-08-18T09:07:10.183Z",
+    "action": "vault.add",
+    "username": "admin",
+    "ip": "::1",
+    "target": "Test GitHub",
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "ffcd7198-f532-48e1-ae54-f2b092a0bf54",
+    "timestamp": "2026-08-18T09:07:10.172Z",
+    "action": "auth.login.success",
+    "username": "admin",
+    "ip": "::1",
+    "target": null,
+    "details": null,
+    "success": true
+  },
+  {
+    "id": "5fee125b-e429-42a1-8252-decfcdc9bbaf",
+    "timestamp": "2026-08-18T09:03:51.068Z",
+    "action": "auth.login.fail",
+    "username": "admin",
+    "ip": "::1",
+    "target": null,
+    "details": "Configuration LDAP invalide côté serveur.",
+    "success": false
+  },
+  {
+    "id": "ac1204d1-a44f-4545-a927-5c77e90bba97",
+    "timestamp": "2026-08-18T09:02:52.785Z",
+    "action": "auth.login.fail",
+    "username": "admin",
+    "ip": "::1",
+    "target": null,
+    "details": "Configuration LDAP invalide côté serveur.",
+    "success": false
+  }
+]

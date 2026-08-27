@@ -58,5 +58,41 @@
     "notes": "Accès portail intranet.",
     "createdAt": "2026-07-22T08:49:35.297Z",
     "updatedAt": "2026-07-22T08:49:35.297Z"
+  },
+  {
+    "id": "4dc6dfe9-59af-4349-ab74-f9f46f1cc78d",
+    "owner": "admin",
+    "title": "Test GitHub",
+    "websiteUrl": "https://github.com",
+    "username": "testuser",
+    "encryptedPassword": "ff43f62b19b4ba55a99d3d5b:e144c8a1f00ef163f733ed7aedd3214b:84da309c458c41ac7087f0aba5058d8c",
+    "category": "Professionnel",
+    "notes": "Compte de test",
+    "createdAt": "2026-08-18T09:07:10.182Z",
+    "updatedAt": "2026-08-18T09:07:10.182Z"
+  },
+  {
+    "id": "45ba68d9-aeda-440b-ac1e-215836d77cd4",
+    "owner": "admin",
+    "title": "Gmail Test",
+    "websiteUrl": "https://gmail.com",
+    "username": "test@gmail.com",
+    "encryptedPassword": "21d2aab4a05e89b1e34e3bc9:328f17776d104e711de4292f8f3e9aae:6ba4876284a5e63e",
+    "category": "Personnel",
+    "notes": "Compte test",
+    "createdAt": "2026-08-18T09:07:10.204Z",
+    "updatedAt": "2026-08-18T09:07:10.204Z"
+  },
+  {
+    "id": "9c0a9d68-8cef-4d5a-92d2-af17c31b01d8",
+    "owner": "admin",
+    "title": "Facebook Test",
+    "websiteUrl": "https://facebook.com",
+    "username": "testfb",
+    "encryptedPassword": "ed929033fa3b2e414db05c50:6a6bd0f3792094eb2116d57a271d6be6:888f7e83c2df98bfb463",
+    "category": "Réseaux Sociaux",
+    "notes": "Test import",
+    "createdAt": "2026-08-18T09:07:10.207Z",
+    "updatedAt": "2026-08-18T09:07:10.207Z"
   }
 ]

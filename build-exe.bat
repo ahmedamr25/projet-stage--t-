@@ -5,7 +5,7 @@ echo =====================================================
 echo.
 cd /d "%~dp0"
 echo Installation / Verification des dependances...
-pip install pyinstaller customtkinter requests pyautogui pyperclip playwright 2>nul
+pip install -r requirements.txt pyinstaller 2>nul
 echo Installation des navigateurs Playwright (Firefox + Chromium)...
 python -m playwright install firefox chromium 2>nul
 

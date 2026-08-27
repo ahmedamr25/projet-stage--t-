@@ -1,0 +1,12 @@
+[
+  {
+    "id": "71ab3c5a-f235-4b0a-9344-27dd88135d40",
+    "passwordId": "4dc6dfe9-59af-4349-ab74-f9f46f1cc78d",
+    "sharedBy": "admin",
+    "sharedWith": "user123",
+    "permission": "read",
+    "encryptedKey": "8aaa766fa163c0870b60daecfdfda4158fffc0f9827cb66796e853fe5fb26bb6",
+    "expiresAt": null,
+    "createdAt": "2026-08-18T09:07:10.214Z"
+  }
+]

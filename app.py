@@ -18,9 +18,18 @@ import subprocess
 import requests
 import pyautogui
 import pyperclip
+import re
 import customtkinter as ctk
 from tkinter import messagebox, filedialog
 from datetime import datetime, timezone
+from PIL import Image, ImageDraw
+
+try:
+    import qrcode
+    QRCODE_AVAILABLE = True
+except ImportError:
+    qrcode = None
+    QRCODE_AVAILABLE = False
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -274,13 +283,24 @@ class AddEditModal(ctk.CTkToplevel):
         ctk.CTkLabel(self, text="Clé 2FA / TOTP Secret (Optionnel, ex: JBSWY3DPEHPK3PXP)", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=35)
         self.entry_totp = ctk.CTkEntry(self, placeholder_text="Base32 Secret...", height=36)
         self.entry_totp.pack(fill="x", padx=35, pady=(2, 8))
-        if self.item: self.entry_totp.insert(0, self.item.get('totpSecret', ''))
+        totp_val = ''
+        if self.item:
+            totp_val = self.item.get('totpSecret') or ''
+            if not totp_val and '[TOTP:' in (self.item.get('notes') or ''):
+                try:
+                    totp_val = self.item.get('notes').split('[TOTP:')[1].split(']')[0].strip()
+                except Exception:
+                    pass
+        self.entry_totp.insert(0, totp_val)
 
         # Notes
         ctk.CTkLabel(self, text="Notes confidentielles", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=35)
         self.entry_notes = ctk.CTkEntry(self, placeholder_text="Remarques...", height=36)
         self.entry_notes.pack(fill="x", padx=35, pady=(2, 12))
-        if self.item: self.entry_notes.insert(0, self.item.get('notes', ''))
+        clean_notes_val = ''
+        if self.item:
+            clean_notes_val = re.sub(r'\[TOTP:[^\]]+\]', '', self.item.get('notes') or '').strip()
+        self.entry_notes.insert(0, clean_notes_val)
 
         # Boutons d'action
         frame_btn = ctk.CTkFrame(self, fg_color="transparent")
@@ -304,14 +324,21 @@ class AddEditModal(ctk.CTkToplevel):
             messagebox.showerror("Erreur", "Le titre et le mot de passe sont obligatoires.", parent=self)
             return
 
+        totp_secret = self.entry_totp.get().strip()
+        raw_notes = self.entry_notes.get().strip()
+        clean_notes = re.sub(r'\[TOTP:[^\]]+\]', '', raw_notes).strip()
+
+        if totp_secret:
+            clean_notes = f"{clean_notes} [TOTP:{totp_secret}]".strip() if clean_notes else f"[TOTP:{totp_secret}]"
+
         payload = {
             "title": title,
             "category": self.opt_category.get(),
             "websiteUrl": self.entry_url.get().strip(),
             "username": self.entry_user.get().strip(),
             "password": pwd,
-            "totpSecret": self.entry_totp.get().strip(),
-            "notes": self.entry_notes.get().strip()
+            "totpSecret": totp_secret,
+            "notes": clean_notes
         }
 
         if self.on_save_callback:
@@ -387,13 +414,13 @@ class ShareModal(ctk.CTkToplevel):
         expiresAt = None
         now_ms = time.time()
         if "24" in exp_raw:
-            expiresAt = datetime.utcfromtimestamp(now_ms + 86400).isoformat() + "Z"
+            expiresAt = datetime.fromtimestamp(now_ms + 86400, timezone.utc).isoformat().replace("+00:00", "Z")
         elif "7" in exp_raw:
-            expiresAt = datetime.utcfromtimestamp(now_ms + 7 * 86400).isoformat() + "Z"
+            expiresAt = datetime.fromtimestamp(now_ms + 7 * 86400, timezone.utc).isoformat().replace("+00:00", "Z")
         elif "30" in exp_raw:
-            expiresAt = datetime.utcfromtimestamp(now_ms + 30 * 86400).isoformat() + "Z"
+            expiresAt = datetime.fromtimestamp(now_ms + 30 * 86400, timezone.utc).isoformat().replace("+00:00", "Z")
         elif "90" in exp_raw:
-            expiresAt = datetime.utcfromtimestamp(now_ms + 90 * 86400).isoformat() + "Z"
+            expiresAt = datetime.fromtimestamp(now_ms + 90 * 86400, timezone.utc).isoformat().replace("+00:00", "Z")
 
         payload = {
             "sharedWith": target_user,
@@ -977,16 +1004,37 @@ class TOTPSetupModal(ctk.CTkToplevel):
         if not self.secret_value:
             return
         self.lbl_secret.configure(text=self.secret_value)
-        qr = generate_ascii_qr(self.otpauth_url or self.secret_value)
-        self.lbl_qr.configure(text=qr)
+        data_to_encode = self.otpauth_url or self.secret_value
+
+        if QRCODE_AVAILABLE and qrcode:
+            try:
+                qr = qrcode.QRCode(
+                    version=None,
+                    error_correction=qrcode.constants.ERROR_CORRECT_M,
+                    box_size=6,
+                    border=2
+                )
+                qr.add_data(data_to_encode)
+                qr.make(fit=True)
+                pil_img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
+                ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(190, 190))
+                self.lbl_qr.configure(image=ctk_img, text="")
+            except Exception as e:
+                qr = generate_ascii_qr(data_to_encode)
+                self.lbl_qr.configure(text=qr, image=None)
+        else:
+            qr = generate_ascii_qr(data_to_encode)
+            self.lbl_qr.configure(text=qr, image=None)
+
         self.update_totp_code()
 
     def update_totp_code(self):
-        if self.secret_value:
-            code, rem = get_totp_code(self.secret_value)
-            if code:
-                self.lbl_totp_code.configure(text=f"{code[:3]} {code[3:]}  (⏱️ {rem}s)")
-        self.after(5000, self.update_totp_code)
+        if hasattr(self, 'lbl_totp_code') and self.lbl_totp_code.winfo_exists():
+            if self.secret_value:
+                code, rem = get_totp_code(self.secret_value)
+                if code:
+                    self.lbl_totp_code.configure(text=f"{code[:3]} {code[3:]}  (⏱️ {rem}s)")
+            self.after(1000, self.update_totp_code)
 
     def _start_totp_timer(self):
         pass
@@ -1507,7 +1555,7 @@ class SecurPassApp(ctk.CTk):
         self.btn_nav_security = ctk.CTkButton(self.sidebar, text="🔐 Sécurité", anchor="w", fg_color="transparent", text_color=COLOR_MUTED, command=lambda: self.switch_view("security"))
         self.btn_nav_security.pack(fill="x", padx=15, pady=4)
 
-        self.btn_nav_totp = ctk.CTkButton(self.sidebar, text="🔑 2FA / TOTP", anchor="w", fg_color="transparent", text_color=COLOR_MUTED, command=lambda: self.open_totp_modal)
+        self.btn_nav_totp = ctk.CTkButton(self.sidebar, text="🔑 2FA / TOTP", anchor="w", fg_color="transparent", text_color=COLOR_MUTED, command=self.open_totp_modal)
         self.btn_nav_totp.pack(fill="x", padx=15, pady=4)
 
         # Onglet Admin si l'utilisateur a les droits d'administration
@@ -2212,6 +2260,24 @@ class SecurPassApp(ctk.CTk):
 
     def open_history_modal(self, item):
         PasswordHistoryModal(self, item=item, token=self.token)
+
+    def open_totp_modal(self):
+        if self.is_offline:
+            messagebox.showwarning("Hors-Ligne", "La configuration 2FA / TOTP nécessite une connexion au serveur.", parent=self)
+            return
+        TOTPSetupModal(self, token=self.token)
+
+    def open_audit_modal(self):
+        if self.is_offline:
+            messagebox.showwarning("Hors-Ligne", "Le journal d'audit nécessite une connexion au serveur.", parent=self)
+            return
+        AuditLogModal(self, token=self.token)
+
+    def open_policy_modal(self):
+        if self.is_offline:
+            messagebox.showwarning("Hors-Ligne", "La politique de mots de passe nécessite une connexion au serveur.", parent=self)
+            return
+        PolicyModal(self, token=self.token)
 
     # Actions API CRUD
     def save_entry(self, payload, item_id=None):

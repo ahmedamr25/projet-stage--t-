@@ -6,7 +6,7 @@ import tls from 'tls';
 
 dotenv.config();
 
-const isMock = process.env.LDAP_MOCK === 'true';
+const isMock = () => process.env.LDAP_MOCK === 'true';
 
 export function escapeLdapFilterValue(value) {
   return String(value).replace(/[\0\(\)\*\\]/g, (ch) => {
@@ -64,7 +64,7 @@ function getUserSuffixDomain() {
 }
 
 function validateLdapConfigOrThrow() {
-  if (isMock) return;
+  if (isMock()) return;
   const required = ['LDAP_URL', 'LDAP_BASE_DN'];
   const missing = required.filter((k) => !process.env[k] || !String(process.env[k]).trim());
   if (missing.length > 0) {
@@ -502,7 +502,7 @@ export function authenticateUser(username, password) {
       return resolve({ success: false, error: usernameCheck.error });
     }
 
-    if (isMock) {
+    if (isMock()) {
       return handleMockAuth(usernameCheck.username, password, resolve);
     }
 
@@ -516,7 +516,7 @@ export function authenticateUser(username, password) {
 
 export function getAllUsers() {
   return new Promise((resolve) => {
-    if (isMock) {
+    if (isMock()) {
       console.log('[LDAP MOCK] Récupération de tous les utilisateurs');
       return resolve({ success: true, users: getMockUserList() });
     }
@@ -638,7 +638,7 @@ export function createUser({ username, displayName, email, password }) {
       return resolve({ success: false, error: 'Le mot de passe doit contenir entre 8 et 128 caractères.' });
     }
 
-    if (isMock) {
+    if (isMock()) {
       if (mockUsersStore[usernameCheck.username]) {
         return resolve({ success: false, error: 'Cet utilisateur existe déjà.' });
       }
@@ -753,7 +753,7 @@ export function updateUser({ username, displayName, email }) {
       return resolve({ success: false, error: emailCheck.error });
     }
 
-    if (isMock) {
+    if (isMock()) {
       const existing = mockUsersStore[usernameCheck.username];
       if (!existing) {
         return resolve({ success: false, error: 'Utilisateur introuvable.' });
@@ -853,7 +853,7 @@ export function deleteUser(username) {
       return resolve({ success: false, error: usernameCheck.error });
     }
 
-    if (isMock) {
+    if (isMock()) {
       if (!mockUsersStore[usernameCheck.username]) {
         return resolve({ success: false, error: 'Utilisateur introuvable.' });
       }
@@ -936,7 +936,7 @@ export function findUserByUsername(username) {
     const usernameCheck = sanitizeUsername(username);
     const sanitizedUsername = usernameCheck.valid ? usernameCheck.username : String(username || '').trim().toLowerCase();
     
-    if (isMock) {
+    if (isMock()) {
       const user = mockUsersStore[sanitizedUsername];
       if (user) {
         return resolve({

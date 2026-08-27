@@ -1,5 +1,4 @@
-// Script de test des endpoints Import/Export et Partage
-import fetch from 'node-fetch';
+// Native fetch used in Node.js 18+
 
 const API_URL = 'http://localhost:5000/api';
 let authToken = null;
@@ -45,7 +44,7 @@ async function testLogin() {
       },
       body: JSON.stringify({
         username: 'admin',
-        password: 'admin123'
+        password: 'Admin@2026!'
       })
     });
     
